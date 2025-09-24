@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            --webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .api-documentation {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .api-section {
+            margin-bottom: 20px;
+        }
+
+        .api-section h3 {
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .api-item {
+            background: white;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+
+        .method.get { background: #28a745; color: white; }
+        .method.post { background: #007bff; color: white; }
+        .method.put { background: #ffc107; color: black; }
+        .method.delete { background: #dc3545; color: white; }
+
+        .endpoint {
+            font-family: monospace;
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .data-type {
+            color: #6f42c1;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .app-interface {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .form-section, .tasks-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            margin: 0 5px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: black;
+        }
+
+        .task-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #007bff;
+        }
+
+        .task-item.completed {
+            border-left-color: #28a745;
+            opacity: 0.7;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .task-title {
+            font-weight: bold;
+            color: #333;
+            flex-grow: 1;
+        }
+
+        .task-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d1edff;
+            color: #0c5460;
+        }
+
+        .task-description {
+            color: #6c757d;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .api-status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .api-status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .api-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .app-interface {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Task Management System</h1>
+            <p>Full-Stack Application with Backend Services & API Integration</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('documentation')">API Documentation</button>
+            <button class="tab" onclick="showTab('application')">Live Application</button>
+        </div>
+
+        <div id="documentation" class="tab-content active">
+            <div class="api-documentation">
+                <h2>Backend Services & API Documentation</h2>
+                
+                <div class="api-section">
+                    <h3>User Management APIs</h3>
+                    
+                    <div class="api-item">
+                        <span class="method post">POST</span>
+                        <span class="endpoint">/api/users/register</span>
+                        <p><strong>Description:</strong> Register a new user</p>
+                        <p><strong>Request Data:</strong></p>
+                        <ul>
+                            <li>username: <span class="data-type">string</span> (required)</li>
+                            <li>email: <span class="data-type">string</span> (required)</li>
+                            <li>password: <span class="data-type">string</span> (required)</li>
+                        </ul>
+                        <p><strong>Response:</strong> User object with <span class="data-type">id</span>, <span class="data-type">username</span>, <span class="data-type">email</span>, <span class="data-type">createdAt</span></p>
+                    </div>
+
+                    <div class="api-item">
+                        <span class="method post">POST</span>
+                        <span class="endpoint">/api/users/login</span>
+                        <p><strong>Description:</strong> Authenticate user</p>
+                        <p><strong>Request Data:</strong></p>
+                        <ul>
+                            <li>email: <span class="data-type">string</span></li>
+                            <li>password: <span class="data-type">string</span></li>
+                        </ul>
+                        <p><strong>Response:</strong> JWT token + user info</p>
+                    </div>
+
+                    <div class="api-item">
+                        <span class="method get">GET</span>
+                        <span class="endpoint">/api/users/profile</span>
+                        <p><strong>Description:</strong> Get current user profile</p>
+                        <p><strong>Headers:</strong> Authorization: Bearer {token}</p>
+                        <p><strong>Response:</strong> User profile data</p>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <h3>Task Management APIs</h3>
+                    
+                    <div class="api-item">
+                        <span class="method get">GET</span>
+                        <span class="endpoint">/api/tasks</span>
+                        <p><strong>Description:</strong> Get all tasks for authenticated user</p>
+                        <p><strong>Query Parameters:</strong></p>
+                        <ul>
+                            <li>status: <span class="data-type">string</span> (optional) - 'pending' or 'completed'</li>
+                            <li>limit: <span class="data-type">number</span> (optional) - default 50</li>
+                            <li>offset: <span class="data-type">number</span> (optional) - default 0</li>
+                        </ul>
+                        <p><strong>Response:</strong> Array of task objects</p>
+                    </div>
+
+                    <div class="api-item">
+                        <span class="method post">POST</span>
+                        <span class="endpoint">/api/tasks</span>
+                        <p><strong>Description:</strong> Create a new task</p>
+                        <p><strong>Request Data:</strong></p>
+                        <ul>
+                            <li>title: <span class="data-type">string</span> (required)</li>
+                            <li>description: <span class="data-type">string</span> (optional)</li>
+                            <li>priority: <span class="data-type">string</span> (low, medium, high)</li>
+                            <li>dueDate: <span class="data-type">Date</span> (optional)</li>
+                        </ul>
+                        <p><strong>Response:</strong> Created task object</p>
+                    </div>
+
+                    <div class="api-item">
+                        <span class="method put">PUT</span>
+                        <span class="endpoint">/api/tasks/{id}</span>
+                        <p><strong>Description:</strong> Update a task</p>
+                        <p><strong>Request Data:</strong> Partial task object</p>
+                        <p><strong>Response:</strong> Updated task object</p>
+                    </div>
+
+                    <div class="api-item">
+                        <span class="method delete">DELETE</span>
+                        <span class="endpoint">/api/tasks/{id}</span>
+                        <p><strong>Description:</strong> Delete a task</p>
+                        <p><strong>Response:</strong> Success message</p>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <h3>Analytics & Reporting APIs</h3>
+                    
+                    <div class="api-item">
+                        <span class="method get">GET</span>
+                        <span class="endpoint">/api/analytics/dashboard</span>
+                        <p><strong>Description:</strong> Get dashboard statistics</p>
+                        <p><strong>Response:</strong></p>
+                        <ul>
+                            <li>totalTasks: <span class="data-type">number</span></li>
+                            <li>completedTasks: <span class="data-type">number</span></li>
+                            <li>pendingTasks: <span class="data-type">number</span></li>
+                            <li>overdueTasks: <span class="data-type">number</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="api-item">
+                        <span class="method get">GET</span>
+                        <span class="endpoint">/api/analytics/productivity</span>
+                        <p><strong>Description:</strong> Get productivity metrics</p>
+                        <p><strong>Query Parameters:</strong></p>
+                        <ul>
+                            <li>period: <span class="data-type">string</span> (week, month, year)</li>
+                        </ul>
+                        <p><strong>Response:</strong> Time-series data for charts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="application" class="tab-content">
+            <div id="apiStatus" class="api-status" style="display: none;"></div>
+            
+            <div class="app-interface">
+                <div class="form-section">
+                    <h3>Create New Task</h3>
+                    <form id="taskForm">
+                        <div class="form-group">
+                            <label for="taskTitle">Title:</label>
+                            <input type="text" id="taskTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDescription">Description:</label>
+                            <textarea id="taskDescription"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskPriority">Priority:</label>
+                            <select id="taskPriority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDueDate">Due Date:</label>
+                            <input type="date" id="taskDueDate">
+                        </div>
+                        <button type="submit" class="btn">
+                            <span id="createLoading" style="display: none;" class="loading"></span>
+                            Create Task
+                        </button>
+                    </form>
+
+                    <div style="margin-top: 30px;">
+                        <h3>API Testing</h3>
+                        <button class="btn btn-small" onclick="testGetTasks()">Test GET /tasks</button>
+                        <button class="btn btn-small" onclick="testAnalytics()">Test Analytics</button>
+                        <button class="btn btn-small" onclick="testUserProfile()">Test Profile</button>
+                    </div>
+                </div>
+
+                <div class="tasks-section">
+                    <h3>Tasks <span id="tasksCount">(0)</span></h3>
+                    <div id="tasksList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock Database (In-Memory Storage)
+        class MockDatabase {
+            constructor() {
+                this.tasks = [];
+                this.users = [{
+                    id: 1,
+                    username: 'demo_user',
+                    email: 'demo@example.com',
+                    createdAt: new Date().toISOString()
+                }];
+                this.currentUser = this.users[0];
+                this.taskIdCounter = 1;
+                
+                // Initialize with sample data
+                this.initializeSampleData();
+            }
+
+            initializeSampleData() {
+                const sampleTasks = [
+                    {
+                        id: this.taskIdCounter++,
+                        title: 'Complete project documentation',
+                        description: 'Write comprehensive documentation for the new features',
+                        priority: 'high',
+                        status: 'pending',
+                        userId: 1,
+                        createdAt: new Date(Date.now() - 86400000).toISOString(),
+                        dueDate: new Date(Date.now() + 172800000).toISOString()
+                    },
+                    {
+                        id: this.taskIdCounter++,
+                        title: 'Review pull requests',
+                        description: 'Review and approve pending pull requests',
+                        priority: 'medium',
+                        status: 'completed',
+                        userId: 1,
+                        createdAt: new Date(Date.now() - 172800000).toISOString(),
+                        completedAt: new Date(Date.now() - 86400000).toISOString()
+                    }
+                ];
+                this.tasks.push(...sampleTasks);
+            }
+
+            // Task operations
+            getAllTasks(userId, filters = {}) {
+                let tasks = this.tasks.filter(task => task.userId === userId);
+                
+                if (filters.status) {
+                    tasks = tasks.filter(task => task.status === filters.status);
+                }
+                
+                return tasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            }
+
+            createTask(taskData, userId) {
+                const newTask = {
+                    id: this.taskIdCounter++,
+                    ...taskData,
+                    userId,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
+                this.tasks.push(newTask);
+                return newTask;
+            }
+
+            updateTask(taskId, updates, userId) {
+                const taskIndex = this.tasks.findIndex(task => 
+                    task.id === taskId && task.userId === userId
+                );
+                
+                if (taskIndex === -1) return null;
+                
+                this.tasks[taskIndex] = { ...this.tasks[taskIndex], ...updates };
+                
+                if (updates.status === 'completed' && !this.tasks[taskIndex].completedAt) {
+                    this.tasks[taskIndex].completedAt = new Date().toISOString();
+                }
+                
+                return this.tasks[taskIndex];
+            }
+
+            deleteTask(taskId, userId) {
+                const taskIndex = this.tasks.findIndex(task => 
+                    task.id === taskId && task.userId === userId
+                );
+                
+                if (taskIndex === -1) return false;
+                
+                this.tasks.splice(taskIndex, 1);
+                return true;
+            }
+
+            getAnalytics(userId) {
+                const userTasks = this.tasks.filter(task => task.userId === userId);
+                return {
+                    totalTasks: userTasks.length,
+                    completedTasks: userTasks.filter(task => task.status === 'completed').length,
+                    pendingTasks: userTasks.filter(task => task.status === 'pending').length,
+                    overdueTasks: userTasks.filter(task => 
+                        task.status === 'pending' && 
+                        task.dueDate && 
+                        new Date(task.dueDate) < new Date()
+                    ).length
+                };
+            }
+        }
+
+        // Mock Backend API
+        class MockAPI {
+            constructor() {
+                this.db = new MockDatabase();
+                this.baseUrl = '/api';
+            }
+
+            async simulateNetworkDelay(min = 200, max = 800) {
+                const delay = Math.random() * (max - min) + min;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+
+            async request(method, endpoint, data = null) {
+                await this.simulateNetworkDelay();
+
+                try {
+                    const response = await this.handleRequest(method, endpoint, data);
+                    return {
+                        success: true,
+                        data: response,
+                        status: 200
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error: error.message,
+                        status: 400
+                    };
+                }
+            }
+
+            async handleRequest(method, endpoint, data) {
+                const userId = this.db.currentUser.id;
+
+                switch (`${method} ${endpoint}`) {
+                    case 'GET /tasks':
+                        return this.db.getAllTasks(userId, data);
+                    
+                    case 'POST /tasks':
+                        if (!data.title) throw new Error('Title is required');
+                        return this.db.createTask(data, userId);
+                    
+                    case 'PUT /tasks':
+                        return this.db.updateTask(data.id, data, userId);
+                    
+                    case 'DELETE /tasks':
+                        const deleted = this.db.deleteTask(data.id, userId);
+                        if (!deleted) throw new Error('Task not found');
+                        return { message: 'Task deleted successfully' };
+                    
+                    case 'GET /users/profile':
+                        return this.db.currentUser;
+                    
+                    case 'GET /analytics/dashboard':
+                        return this.db.getAnalytics(userId);
+                    
+                    case 'GET /analytics/productivity':
+                        // Mock productivity data
+                        return {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            completed: [3, 5, 2, 8, 6, 1, 4],
+                            created: [2, 3, 6, 4, 8, 2, 5]
+                        };
+                    
+                    default:
+                        throw new Error(`Endpoint not found: ${method} ${endpoint}`);
+                }
+            }
+        }
+
+        // Frontend Application
+        class TaskApp {
+            constructor() {
+                this.api = new MockAPI();
+                this.tasks = [];
+                this.init();
+            }
+
+            async init() {
+                this.bindEvents();
+                await this.loadTasks();
+            }
+
+            bindEvents() {
+                document.getElementById('taskForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.createTask();
+                });
+            }
+
+            async createTask() {
+                const form = document.getElementById('taskForm');
+                const loading = document.getElementById('createLoading');
+                
+                const taskData = {
+                    title: document.getElementById('taskTitle').value,
+                    description: document.getElementById('taskDescription').value,
+                    priority: document.getElementById('taskPriority').value,
+                    dueDate: document.getElementById('taskDueDate').value || null
+                };
+
+                loading.style.display = 'inline-block';
+                this.showStatus('Creating task...', 'success');
+
+                const response = await this.api.request('POST', '/tasks', taskData);
+                loading.style.display = 'none';
+
+                if (response.success) {
+                    this.showStatus('Task created successfully!', 'success');
+                    form.reset();
+                    await this.loadTasks();
+                } else {
+                    this.showStatus(`Error: ${response.error}`, 'error');
+                }
+            }
+
+            async loadTasks() {
+                const response = await this.api.request('GET', '/tasks');
+                
+                if (response.success) {
+                    this.tasks = response.data;
+                    this.renderTasks();
+                    this.updateTasksCount();
+                } else {
+                    this.showStatus(`Error loading tasks: ${response.error}`, 'error');
+                }
+            }
+
+            async toggleTaskStatus(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                const newStatus = task.status === 'pending' ? 'completed' : 'pending';
+                
+                const response = await this.api.request('PUT', '/tasks', {
+                    id: taskId,
+                    status: newStatus
+                });
+
+                if (response.success) {
+                    await this.loadTasks();
+                    this.showStatus(`Task ${newStatus}!`, 'success');
+                } else {
+                    this.showStatus(`Error: ${response.error}`, 'error');
+                }
+            }
+
+            async deleteTask(taskId) {
+                if (!confirm('Are you sure you want to delete this task?')) return;
+                
+                const response = await this.api.request('DELETE', '/tasks', { id: taskId });
+
+                if (response.success) {
+                    await this.loadTasks();
+                    this.showStatus('Task deleted successfully!', 'success');
+                } else {
+                    this.showStatus(`Error: ${response.error}`, 'error');
+                }
+            }
+
+            renderTasks() {
+                const container = document.getElementById('tasksList');
+                
+                if (this.tasks.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #6c757d;">No tasks found. Create your first task!</p>';
+                    return;
+                }
+
+                container.innerHTML = this.tasks.map(task => `
+                    <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
+                        <div class="task-header">
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-status ${task.status === 'completed' ? 'status-completed' : 'status-pending'}">
+                                ${task.status}
+                            </div>
+                        </div>
+                        ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                        <div class="task-meta">
+                            <span>Priority: ${task.priority}</span>
+                            <div>
+                                <button class="btn btn-small ${task.status === 'completed' ? 'btn-warning' : ''}" 
+                                        onclick="app.toggleTaskStatus(${task.id})">
+                                    ${task.status === 'completed' ? 'Reopen' : 'Complete'}
+                                </button>
+                                <button class="btn btn-small btn-danger" onclick="app.deleteTask(${task.id})">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateTasksCount() {
+                document.getElementById('tasksCount').textContent = `(${this.tasks.length})`;
+            }
+
+            showStatus(message, type) {
+                const statusEl = document.getElementById('apiStatus');
+                statusEl.textContent = message;
+                statusEl.className = `api-status ${type}`;
+                statusEl.style.display = 'block';
+                
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 3000);
+            }
+
+            // API Testing Methods
+            async testGetTasks() {
+                const response = await this.api.request('GET', '/tasks');
+                this.showStatus(`GET /tasks: ${response.success ? 'Success' : 'Failed'} - ${response.success ? response.data.length + ' tasks' : response.error}`, response.success ? 'success' : 'error');
+            }
+
+            async testAnalytics() {
+                const response = await this.api.request('GET', '/analytics/dashboard');
+                if (response.success) {
+                    const data = response.data;
+                    this.showStatus(`Analytics: ${data.totalTasks} total, ${data.completedTasks} completed, ${data.pendingTasks} pending`, 'success');
+                } else {
+                    this.showStatus(`Analytics failed: ${response.error}`, 'error');
+                }
+            }
+
+            async testUserProfile() {
+                const response = await this.api.request('GET', '/users/profile');
+                if (response.success) {
+                    this.showStatus(`User Profile: ${response.data.username} (${response.data.email})`, 'success');
+                } else {
+                    this.showStatus(`Profile failed: ${response.error}`, 'error');
+                }
+            }
+        }
+
+        // Utility Functions
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Global API testing functions
+        async function testGetTasks() {
+            await app.testGetTasks();
+        }
+
+        async function testAnalytics() {
+            await app.testAnalytics();
+        }
+
+        async function testUserProfile() {
+            await app.testUserProfile();
+        }
+
+        // Initialize the application
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new TaskApp();
+        });
+    </script>
+</body>
+</html>
